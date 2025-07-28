@@ -1,7 +1,7 @@
 # Setup
 import csv
 import numpy as np
-import math
+import random
 
 # Build matrix and setup graph
 matrix = []
@@ -29,33 +29,46 @@ y.sort()
 def result(weight, x_value, bias):
     return weight*x_value + bias
 
-# Function for Mean Error
-def meanError(weight, bias):
+# Function for Mean Absolute Error
+def meanAbsoluteError(weight, bias):
     sum = 0
     
     for i in range(len(y_np)):
-        sum += result(weight, x[i], bias) - y_np[i]
+        sum += abs(result(weight, x[i], bias) - y_np[i])
     
     return sum / len(y_np)
 
-# Function to find value with lowest and highest difference
-def printMinandMax(weight, bias):
-    min = result(weight, x[0], bias) - y[0]
-    max = result(weight, x[0], bias) - y[0]
+# One big function to save the amount of loops
+def bigFunction(w, b):
+    min = result(w, x[0], b) - y_np[0]
+    max = result(w, x[0], b) - y_np[0]
     index_min = 0
     index_max = 0
-    
-    for i in range(1, len(y_np)):
-        if result(weight, x[i], bias) - y[i] > max:
-            max = result(weight, x[i], bias) - y[i]
-            index_max = i
+    sum_1 = 0
+    sum_2 = 0
+    points_above = 0
+    points_below = 0
+
+    for i in range(len(y_np)):
+        sum_1 += result(w, x[i], b) - y_np[i]
+        sum_2 += abs(result(w, x[i], b) - y_np[i])
+
+        if result(w, x[i], b) - y_np[i] > 0:
+            points_below += 1
+        elif result(w, x[i], b) - y_np[i] < 0:
+            points_above += 1
         
-        if result(weight, x[i], bias) - y[i] < min:
-            min = result(weight, x[i], bias) - y[i]
+        if result(w, x[i], b) - y_np[i] > max:
+            max = result(w, x[i], b) - y_np[i]
+            index_max = i
+        if result(w, x[i], b) - y_np[i] < min:
+            min = result(w, x[i], b) - y_np[i]
             index_min = i
+
+    meanError = sum_1 / len(y_np)
+    meanAbsoluteError = sum_2 / len(y_np)
     
-    print("Minimum difference is: " + str(min) + ", at node "+ str(index_min))
-    print("Maximum difference is: " + str(max) + ", at node "+ str(index_max))
+    return min, max, index_min, index_max, points_above, points_below, meanError, meanAbsoluteError
 
 # Function for printing algorithm output
 def returnOutput(weight, bias):
@@ -66,17 +79,55 @@ def returnOutput(weight, bias):
     
     return output
     
-
 # Linear Regression algorithm
 b = y[0]
 w = (y[len(y)-1] - y[0]) / (x[len(x)-1] - x[0])
 
+clean_tries_needed = 100000
+_, _, _, _, _, _, _, best = bigFunction(w, b)
+
+while clean_tries_needed > 0:
+    w_temp = w
+    b_temp = b
+    _, _, _, _, points_below_temp, points_above_temp, meanError_temp, meanAbsoluteError_temp = bigFunction(w,b)
+
+    if meanError_temp < 0:
+        b_temp += random.random() * w * 10
+    elif meanError_temp > 0:
+        b_temp -= random.random() * w * 10
+
+    if points_below_temp > points_above_temp:
+        w_temp -= random.random() * (w_temp / 10)
+    elif points_below_temp < points_above_temp:
+        w_temp += random.random() * (w_temp / 10)
+
+    if meanAbsoluteError(w_temp, b_temp) < best:
+        clean_tries_needed = 5
+        w = w_temp
+        b = b_temp
+        best = meanAbsoluteError(w, b)
+    else:
+        clean_tries_needed -= 1
+
 # Output
-print("")
-print("Orginial: " + str(y))
-print("")
-print("Predicted: " + str(returnOutput(w, b)))
-print("")
-printMinandMax(w, b)
-print("")
-print("Mean Error: " + str(meanError(w, b)))
+def printOutput():
+    print("")
+    print("Weight: " + str(w))
+    print("Bias: " + str(b))
+    print("Equation: y = " + str(w) + "x+" + str(b))
+    print("")
+    print("Orginial: " + str(y_np.tolist()))
+    print("")
+    print("Predicted: " + str(returnOutput(w, b)))
+    print("")
+    
+    min, max, index_min, index_max, _, _, meanError, meanAbsoluteError = bigFunction(w, b)
+    print("Minimum difference is: " + str(min) + ", at node "+ str(index_min))
+    print("Maximum difference is: " + str(max) + ", at node "+ str(index_max))
+    
+    print()
+    print("")
+    print("Mean Error: " + str(meanError))
+    print("Mean Absolute Error: " + str(meanAbsoluteError))
+
+printOutput()
