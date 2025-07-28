@@ -83,10 +83,9 @@ def returnOutput(weight, bias):
 b = y[0]
 w = (y[len(y)-1] - y[0]) / (x[len(x)-1] - x[0])
 
-clean_tries_needed = 100000
 _, _, _, _, _, _, _, best = bigFunction(w, b)
 
-while clean_tries_needed > 0:
+while meanAbsoluteError(w, b) > 25:
     w_temp = w
     b_temp = b
     _, _, _, _, points_below_temp, points_above_temp, meanError_temp, meanAbsoluteError_temp = bigFunction(w,b)
@@ -102,12 +101,9 @@ while clean_tries_needed > 0:
         w_temp += random.random() * (w_temp / 10)
 
     if meanAbsoluteError(w_temp, b_temp) < best:
-        clean_tries_needed = 5
         w = w_temp
         b = b_temp
         best = meanAbsoluteError(w, b)
-    else:
-        clean_tries_needed -= 1
 
 # Output
 def printOutput():
