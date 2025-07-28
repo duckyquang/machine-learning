@@ -34,14 +34,14 @@ def meanAbsoluteError(weight, bias):
     sum = 0
     
     for i in range(len(y_np)):
-        sum += abs(result(weight, x[i], bias) - y_np[i])
+        sum += abs(result(weight, x_np[i], bias) - y_np[i])
     
     return sum / len(y_np)
 
 # One big function to save the amount of loops
 def bigFunction(w, b):
-    min = result(w, x[0], b) - y_np[0]
-    max = result(w, x[0], b) - y_np[0]
+    min = result(w, x_np[0], b) - y_np[0]
+    max = result(w, x_np[0], b) - y_np[0]
     index_min = 0
     index_max = 0
     sum_1 = 0
@@ -50,19 +50,19 @@ def bigFunction(w, b):
     points_below = 0
 
     for i in range(len(y_np)):
-        sum_1 += result(w, x[i], b) - y_np[i]
-        sum_2 += abs(result(w, x[i], b) - y_np[i])
+        sum_1 += result(w, x_np[i], b) - y_np[i]
+        sum_2 += abs(result(w, x_np[i], b) - y_np[i])
 
-        if result(w, x[i], b) - y_np[i] > 0:
+        if result(w, x_np[i], b) - y_np[i] > 0:
             points_below += 1
-        elif result(w, x[i], b) - y_np[i] < 0:
+        elif result(w, x_np[i], b) - y_np[i] < 0:
             points_above += 1
         
-        if abs(result(w, x[i], b) - y_np[i]) > max:
-            max = result(w, x[i], b) - y_np[i]
+        if abs(result(w, x_np[i], b) - y_np[i]) > max:
+            max = abs(result(w, x_np[i], b) - y_np[i])
             index_max = i
-        if abs(result(w, x[i], b) - y_np[i]) < min:
-            min = result(w, x[i], b) - y_np[i]
+        if abs(result(w, x_np[i], b) - y_np[i]) < min:
+            min = abs(result(w, x_np[i], b) - y_np[i])
             index_min = i
 
     meanError = sum_1 / len(y_np)
@@ -75,7 +75,7 @@ def returnOutput(weight, bias):
     output = []
     
     for i in range(len(y_np)):
-        output.append(result(weight, x[i], bias))
+        output.append(result(weight, x_np[i], bias))
     
     return output
     
@@ -85,7 +85,7 @@ w = (y[len(y)-1] - y[0]) / (x[len(x)-1] - x[0])
 
 _, _, _, _, _, _, _, best = bigFunction(w, b)
 
-while meanAbsoluteError(w, b) > 25:
+while meanAbsoluteError(w, b) > 14:
     w_temp = w
     b_temp = b
     _, _, _, _, points_below_temp, points_above_temp, meanError_temp, meanAbsoluteError_temp = bigFunction(w,b)
