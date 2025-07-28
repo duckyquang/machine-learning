@@ -58,10 +58,10 @@ def bigFunction(w, b):
         elif result(w, x[i], b) - y_np[i] < 0:
             points_above += 1
         
-        if result(w, x[i], b) - y_np[i] > max:
+        if abs(result(w, x[i], b) - y_np[i]) > max:
             max = result(w, x[i], b) - y_np[i]
             index_max = i
-        if result(w, x[i], b) - y_np[i] < min:
+        if abs(result(w, x[i], b) - y_np[i]) < min:
             min = result(w, x[i], b) - y_np[i]
             index_min = i
 
