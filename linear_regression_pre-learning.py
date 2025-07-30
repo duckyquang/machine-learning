@@ -2,6 +2,8 @@
 import csv
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+
 
 # Build matrix and setup graph
 matrix = []
@@ -85,20 +87,20 @@ w = (y[len(y)-1] - y[0]) / (x[len(x)-1] - x[0])
 
 _, _, _, _, _, _, _, best = bigFunction(w, b)
 
-while meanAbsoluteError(w, b) > 14:
+while meanAbsoluteError(w, b) > 10:
     w_temp = w
     b_temp = b
     _, _, _, _, points_below_temp, points_above_temp, meanError_temp, meanAbsoluteError_temp = bigFunction(w,b)
 
     if meanError_temp < 0:
-        b_temp += random.random() * w * 10
+        b_temp += random.random() * w * 5
     elif meanError_temp > 0:
-        b_temp -= random.random() * w * 10
+        b_temp -= random.random() * w * 5
 
     if points_below_temp > points_above_temp:
-        w_temp -= random.random() * (w_temp / 10)
+        w_temp -= random.random()
     elif points_below_temp < points_above_temp:
-        w_temp += random.random() * (w_temp / 10)
+        w_temp += random.random()
 
     if meanAbsoluteError(w_temp, b_temp) < best:
         w = w_temp
@@ -127,3 +129,20 @@ def printOutput():
     print("Mean Absolute Error: " + str(meanAbsoluteError))
 
 printOutput()
+
+# Plot graph
+matrix_np = np.array(matrix)
+
+x_np = np.array(matrix_np[:,0])
+y_np = np.array(matrix_np[:,1])
+
+plt.scatter(x_np, y_np)
+
+def equation(x):
+    return w*x + b
+
+x_line = np.linspace(min(x_np), max(x_np), 100)
+y_line = equation(x_line)
+
+plt.plot(x_line, y_line, color='red')
+plt.show()
